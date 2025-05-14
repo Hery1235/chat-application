@@ -12,7 +12,7 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
   }, []);
 
   return selectedUser ? (
-    <div className="h-full overflow-scroll relative backdrop-blur-lg">
+    <div className="h-full overflow-scroll relative backdrop-blur-lg px-2">
       {/*                           Navbar                */}
       <div className="flex items-center border-b border-stone-500 gap-3 py-3 mx-4">
         <img
@@ -80,14 +80,25 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
       </div>
 
       {/*                         Send message Areea              */}
-      {/* <div className="flex justify-between bg-[#282142]/50 p-3 rounded-full absolute b-0 left-0">
-        <input
-          className="border-none outline-none text-sm text-white "
-          type="text"
-          placeholder="Send a messege"
-        />
-        <img className="w-3 h-3" src={assets.gallery_icon} alt="gellary" />
-      </div> */}
+      <div className="absolute bottom-0 left-0 right-0 flex items-center gap-3 p-3">
+        <div className="flex flex-1 items-center bg-gray-100/2 p-3 rounded-full">
+          <input
+            className="border-none outline-none text-sm text-white placeholder-gray-400
+           flex-1 rounded-lg"
+            type="text"
+            placeholder="Send a message "
+          />
+          <input type="file" id="image" accept="image/png image/jpeg" hidden />
+          <label htmlFor="image">
+            <img
+              className="w-5 mr-2 cursor-pointer"
+              src={assets.gallery_icon}
+              alt=""
+            />
+          </label>
+        </div>
+        <img className="w-7 cursor-pointer" src={assets.send_button} alt="" />
+      </div>
     </div>
   ) : (
     <div className="flex justify-center items-center h-full w-full flex-col gap-2 text-gray-500 bg-white/10 max-md:hidden">
