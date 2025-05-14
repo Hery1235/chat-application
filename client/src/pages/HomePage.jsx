@@ -5,6 +5,7 @@ import RightSidebar from "../components/RightSidebar";
 
 const HomePage = () => {
   const [selectedUser, setSelectedUser] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   return (
     <div className="text-white w-full h-screen border sm:px-[15%] sm:py-[5%]">
       <div
@@ -16,11 +17,15 @@ const HomePage = () => {
           }`}
       >
         <Sidebar
+          showChat={showChat}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
         />
-        <ChatContainer />
-        <RightSidebar />
+        <ChatContainer
+          selectedUser={selectedUser}
+          setSelectedUser={setSelectedUser}
+        />
+        <RightSidebar selectedUser={selectedUser} />
       </div>
     </div>
   );
