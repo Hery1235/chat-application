@@ -39,7 +39,16 @@ io.on("connection", (socket) => {
 });
 
 // Middleware setup
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://chat-application-am48.vercel.app",
+      "http://localhost:5173",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "4mb" }));
 
 // Connecting database
