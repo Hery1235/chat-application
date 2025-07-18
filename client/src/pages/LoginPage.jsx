@@ -1,5 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import assets from "../assets/assets";
+import { AuthContext } from "../../context/AuthContext";
+import { Navigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [currentState, setCurrentState] = useState("Sign Up");
@@ -8,12 +12,22 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
+  const navigate = useNavigate();
 
-  const onSubmitHandler = (event) => {
+  const { axios, setToken, setAuthUser, login } = useContext(AuthContext);
+
+  const onSubmitHandler = async (event) => {
     event.preventDefault();
     if (currentState == "Sign Up" && !isDataSubmitted) {
       setIsDataSubmitted(true);
       return;
+    } else {
+      login(currentState === "Sign Up" ? "signup" : "login", {
+        fullName,
+        email,
+        password,
+        bio,
+      });
     }
   };
 

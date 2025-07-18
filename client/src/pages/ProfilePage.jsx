@@ -1,15 +1,31 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import assets from "../assets/assets";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 const ProfilePage = () => {
+  const { updateProfile, authUser } = useContext(AuthContext);
   const [profileImage, setProfileImage] = useState(null);
   const navigate = useNavigate();
-  const [name, setName] = useState("Muhammad Haris");
-  const [bio, setBio] = useState("Hi Everyone");
+  const [name, setName] = useState(authUser.fullName);
+  const [bio, setBio] = useState(authUser.bio);
+  const [isProfileImageSelected, setIsProfileImageSelected] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!isProfileImageSelected) {
+      console.log("NOt selected");
+      updateProfile({ fullName: name, bio });
+      navigate("/");
+      return;
+    }
+    console.log(" selected");
+    const reader = new FileReader();
+    reader.readAsDataURL(profileImage);
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      await updateProfile({ profilePic: base64Image, fullName: name, bio });
+    };
     navigate("/");
   };
 
@@ -32,6 +48,7 @@ const ProfilePage = () => {
             <input
               onChange={(e) => {
                 setProfileImage(e.target.files[0]);
+                setIsProfileImageSelected(true);
               }}
               type="file"
               name=""
@@ -40,7 +57,7 @@ const ProfilePage = () => {
               hidden
             />
             <img
-              className={`w-12 h-12 rounded-full ${profileImage}?"rounded-full":""`}
+              className={`w-12 h-12 rounded-full`}
               src={
                 profileImage
                   ? URL.createObjectURL(profileImage)
@@ -66,7 +83,7 @@ const ProfilePage = () => {
           focus:ring-2 focus-ring-violet-500"
             name=""
             onChange={(e) => {
-              e.target.value;
+              setBio(e.target.value);
             }}
             rows={3}
             value={bio}
@@ -83,7 +100,7 @@ const ProfilePage = () => {
         </form>
         <img
           className="max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10"
-          src={assets.logo_icon}
+          src={authUser?.profilePic || assets.logo_icon}
           alt=""
         />
       </div>
