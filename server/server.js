@@ -12,15 +12,47 @@ import { Server } from "socket.io";
 const app = express();
 const server = http.createServer(app);
 
-// Initilize socket.io server
+// ✅ CORS Configuration (Fix for Vercel)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://chat-application-am48.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like curl or mobile apps)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+// ✅ Handle preflight requests (critical for Vercel)
+app.options("*", cors());
+
+// Middleware
+app.use(express.json({ limit: "4mb" }));
+
+// ✅ Init Socket.io with separate CORS config
 export const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+  },
 });
+
 // Store online users
 export const userSocketMap = {}; // userId: socketId
 
 // Socket.io connection handler
-
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
   console.log("User connected", userId);
@@ -38,29 +70,26 @@ io.on("connection", (socket) => {
   });
 });
 
-// Middleware setup
-app.use(cors());
-
-app.use(express.json({ limit: "4mb" }));
-
-// Connecting database
+// Connect to DB and Cloudinary
 await connectDb();
 connectCloudinary();
+
+// Health Check Route
 app.use("/api/status", (req, res) => {
   res.send("Server is live");
 });
 
-// APi for a user
+// Routes
 app.use("/api/auth", userRouter);
-
-//Api for messaegs
 app.use("/api/message", messageRouter);
 
+// Start server (locally only)
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => {
-    console.log("Server is running of the port ", PORT);
+    console.log("Server is running on port", PORT);
   });
 }
-// Export server for vercel
+
+// Export for Vercel
 export default server;
